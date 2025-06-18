@@ -1,0 +1,6 @@
+model,accuracy_percent
+GPT-3.5,70
+Claude Haiku,75.2
+Gemini Flash,78.9
+GPT-4o free,88.7
+Multi-Model Orchestrated,98 

@@ -1,0 +1,5 @@
+metric,baseline_value,pingpong_value,unit
+weekly_deliverables,2,16,deliverables
+weekly_deliverables_alt,5,10,deliverables
+errors_caught_percent,40,100,percent
+onboarding_time_hours,72,0.0833,hours 

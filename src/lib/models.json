@@ -1,0 +1,154 @@
+{
+  "article": {
+    "clarify-brief": "gpt",
+    "deep-research": "gemini",
+    "first-draft": "gpt",
+    "strengths-analysis": "grok",
+    "initial-structure": "gpt",
+    "logical-enhancement": "claude",
+    "creative-polish": "gpt",
+    "final-logic-check": "claude",
+    "production-ready": "gpt",
+    "multi-model-source-validation": "all-models",
+    "final-source-verification": "claude"
+  },
+  "email": {
+    "decode-request": "gpt",
+    "validate-response": "gemini",
+    "craft-response": "gpt",
+    "multi-model-source-validation": "all-models",
+    "final-source-verification": "claude"
+  },
+  "research": {
+    "clarify-scope": "gpt",
+    "broad-research": "gemini",
+    "structure-findings": "gpt",
+    "deep-dive-research": "gemini",
+    "logical-analysis": "claude",
+    "strategic-synthesis": "gpt",
+    "final-report": "claude",
+    "multi-model-source-validation": "all-models",
+    "final-source-verification": "claude"
+  },
+  "routing": {
+    "defaultResearch": "gemini",
+    "mathCodeResearch": "grok",
+    "finalPolish": "gpt",
+    "logicalAnalysis": "claude",
+    "creativeWriting": "gpt",
+    "factChecking": "gpt",
+    "structuralEditing": "claude",
+    "currentEvents": "grok",
+    "multimodalAnalysis": "gemini",
+    "sourceValidation": "all-models",
+    "reasoningVerification": "claude"
+  },
+  "fallbacks": {
+    "grok": "gemini",
+    "gemini": "gpt",
+    "claude": "gpt",
+    "gpt": null,
+    "all-models": "claude"
+  },
+  "stepOverrides": {
+    "article": {
+      "clarify-brief": "gpt",
+      "deep-research": "gemini",
+      "first-draft": "gpt",
+      "strengths-analysis": "grok",
+      "initial-structure": "gpt",
+      "logical-enhancement": "claude",
+      "creative-polish": "gpt",
+      "final-logic-check": "claude",
+      "production-ready": "gpt",
+      "multi-model-source-validation": "all-models",
+      "final-source-verification": "claude"
+    },
+    "email": {
+      "decode-request": "gpt",
+      "validate-response": "gemini",
+      "craft-response": "gpt",
+      "multi-model-source-validation": "all-models",
+      "final-source-verification": "claude"
+    },
+    "research": {
+      "clarify-scope": "gpt",
+      "broad-research": "gemini",
+      "structure-findings": "gpt",
+      "deep-dive-research": "gemini",
+      "logical-analysis": "claude",
+      "strategic-synthesis": "gpt",
+      "final-report": "claude",
+      "multi-model-source-validation": "all-models",
+      "final-source-verification": "claude"
+    }
+  },
+  "enabledDrivers": {
+    "gpt": true,
+    "claude": true,
+    "gemini": true,
+    "grok": true
+  },
+  "retryPolicy": {
+    "maxRetries": 3,
+    "retryDelay": 1000,
+    "backoffMultiplier": 2
+  },
+  "capabilities": {
+    "gpt": {
+      "strengths": [
+        "logic_audit",
+        "creative_polish",
+        "fact_checking",
+        "json_output"
+      ],
+      "contextLimit": 128000,
+      "costTier": "medium"
+    },
+    "claude": {
+      "strengths": [
+        "long_form_narrative",
+        "structural_analysis",
+        "logical_reasoning",
+        "source_verification"
+      ],
+      "contextLimit": 200000,
+      "costTier": "medium"
+    },
+    "gemini": {
+      "strengths": [
+        "high_volume_research",
+        "multimodal_rag",
+        "document_analysis",
+        "source_validation"
+      ],
+      "contextLimit": 1000000,
+      "costTier": "low"
+    },
+    "grok": {
+      "strengths": [
+        "stem_math_reasoning",
+        "real_time_data",
+        "social_web_search",
+        "source_validation"
+      ],
+      "contextLimit": 128000,
+      "costTier": "high"
+    }
+  },
+  "validationConfig": {
+    "multiModelValidation": {
+      "models": ["gpt", "claude", "gemini", "grok"],
+      "trustPriority": ["grok", "gemini", "claude", "gpt"],
+      "minimumAgreement": 2,
+      "conflictResolution": "claude"
+    },
+    "sourceValidationPrompts": {
+      "gpt": "As GPT, perform rigorous fact-checking on the sources and claims in the following content. Focus on logical consistency, factual accuracy, and identifying any potential misinformation. List each source/claim with your assessment:\n\n{{content}}",
+      "claude": "As Claude, analyze the following content for source reliability and logical reasoning. Identify any potential hallucinations, unsupported claims, or questionable sources. Provide detailed reasoning for each assessment:\n\n{{content}}",
+      "gemini": "As Gemini with access to vast document analysis capabilities, verify the sources and factual claims in the following content. Cross-reference with your knowledge base and identify any inconsistencies or unreliable sources:\n\n{{content}}",
+      "grok": "As Grok with real-time web access, validate the sources and current information in the following content. Check for accuracy, recency, and reliability of claims, especially those related to recent events or data:\n\n{{content}}"
+    },
+    "finalVerificationPrompt": "You are Claude, the most reliable reasoning model. You have received source validation assessments from all 4 AI models (GPT, Claude, Gemini, and Grok). Your task is to:\n\n1. Analyze all validation reports with special trust for Grok and Gemini's source assessments\n2. Identify any hallucinated or unreliable sources that need removal\n3. Provide a final cleaned version of the content with problematic sources removed\n4. List what changes were made and why\n\nValidation Reports:\nGPT Assessment: {{gptValidation}}\nClaude Assessment: {{claudeValidation}}\nGemini Assessment: {{geminiValidation}}\nGrok Assessment: {{grokValidation}}\n\nOriginal Content:\n{{originalContent}}\n\nProvide your final verified content and change summary."
+  }
+}

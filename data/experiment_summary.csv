@@ -1,0 +1,7 @@
+sequence,quality_percent,meets_criteria
+GPT-Grok-Claude,98,yes
+Grok-Claude-GPT,76,no
+GPT-Claude-Grok,84,no
+Claude-GPT-Grok,88,no
+Claude-Grok-GPT,92,no
+Grok-GPT-Claude,90,no 

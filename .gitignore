@@ -1,0 +1,17 @@
+.env
+.env.backup
+
+.venv/
+
+__pycache__/
+
+*.pyc
+
+task
+
+node_modules/
+
+.env.local
+
+.env.development.local
+

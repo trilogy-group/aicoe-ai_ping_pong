@@ -1,0 +1,14 @@
+<!-- favicon.svg  |  AI Ping-Pong  -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+
+  <!-- Paddle (rounded rectangle) -->
+  <rect x="11" y="4" width="8" height="12" rx="2"
+        stroke="#60a5fa" stroke-width="2"/>
+
+  <!-- Handle -->
+  <rect x="14" y="15" width="2" height="5" rx="1" fill="#60a5fa"/>
+
+  <!-- Ball -->
+  <circle cx="6" cy="12" r="3" fill="#60a5fa"/>
+
+</svg>

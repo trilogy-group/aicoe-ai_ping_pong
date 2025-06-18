@@ -1,0 +1,5 @@
+metric,score
+factual_accuracy_percent,98
+logical_coherence_score,98
+readability_grade_level,9
+blind_review_indistinguishable_percent,73 

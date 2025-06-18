@@ -1,0 +1,16 @@
+workflow,run,manual_time_min,automated_time_min,efficiency_gain_percent,manual_quality_percent,automated_quality_percent
+Article Writing,1,120,15,87.5,92,98
+Article Writing,2,118,16,86.4,91,97
+Article Writing,3,122,14,88.5,93,98
+Article Writing,4,119,15,87.3,92,98
+Article Writing,5,121,15,87.6,92,98
+Quick Email,1,32,4,87.5,90,98
+Quick Email,2,35,5,85.7,89,98
+Quick Email,3,30,4,86.7,90,98
+Quick Email,4,33,5,84.9,88,97
+Quick Email,5,31,4,87.1,89,98
+Research Report,1,60,15,75,93,98
+Research Report,2,65,18,72.3,92,97
+Research Report,3,62,16,74.2,93,98
+Research Report,4,59,14,76.3,94,98
+Research Report,5,63,15,76.2,92,97 

@@ -1,0 +1,5 @@
+model,core_strength,ideal_task,avg_step_time_min,quality_lift
+GPT,Creative synthesis + Logic audit,Draft & polish,2.5,30
+Grok,Live data + Math,Research & facts,1.5,40
+Claude,Structure + Clarity,Logic & flow,2,0
+Gemini,Long-context research,Deep analysis,3,0 

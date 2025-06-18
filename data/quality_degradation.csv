@@ -1,0 +1,11 @@
+iteration,approach,accuracy_percent
+1,Multi-Model,98
+2,Multi-Model,98
+3,Multi-Model,98
+4,Multi-Model,98
+5,Multi-Model,98
+1,Single GPT,92
+2,Single GPT,88
+3,Single GPT,84
+4,Single GPT,80
+5,Single GPT,76 
