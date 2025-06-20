@@ -198,6 +198,23 @@ Ready to start the rally?`,
 
   const markdownContent = getMarkdownContent();
 
+  // Copy to clipboard state
+  const [copyStatus, setCopyStatus] = useState<string>("");
+
+  const handleCopyMarkdown = () => {
+    if (!markdownContent.content) return;
+    navigator.clipboard
+      .writeText(markdownContent.content as string)
+      .then(() => {
+        setCopyStatus("Copied!");
+        setTimeout(() => setCopyStatus(""), 2000);
+      })
+      .catch(() => {
+        setCopyStatus("Failed");
+        setTimeout(() => setCopyStatus(""), 2000);
+      });
+  };
+
   useEffect(() => {
     setModel();
   }, [steps]);
@@ -297,7 +314,7 @@ Ready to start the rally?`,
           style={{ zIndex: 9999 }}
         >
           ⚠️ Demo notice: This application is experimental and credits for the
-          AI models are limited. Service may stop once the quota is exhausted.
+          AI models are limited. Service will stop once the quota is exhausted.
           Use for demonstration and visual exploration only.
           <button
             onClick={() => setShowDisclaimer(false)}
@@ -799,13 +816,22 @@ Ready to start the rally?`,
 
             {/* Markdown Card */}
             <div
-              className="w-full max-w-2xl bg-[#141414] rounded-lg p-8 shadow-lg border border-gray-800 flex-1 min-h-0"
+              className="w-full max-w-2xl bg-[#141414] rounded-lg p-8 shadow-lg border border-gray-800 flex-1 min-h-0 relative"
               style={{
                 boxShadow:
                   "0 4px 20px rgba(0, 255, 191, 0.07), 0 1px 3px rgba(0, 0, 0, 0.3)",
                 maxBlockSize: "min-content",
               }}
             >
+              {/* Copy button */}
+              <button
+                onClick={handleCopyMarkdown}
+                className="absolute top-2 right-2 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2 py-0.5 rounded border border-gray-600"
+                title="Copy markdown"
+              >
+                {copyStatus || "Copy"}
+              </button>
+
               <div
                 className={`markdown-content ${selectedModel}-text h-full overflow-y-auto`}
               >
