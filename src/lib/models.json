@@ -10,6 +10,7 @@
     "final-logic-check": "claude",
     "production-ready": "gpt",
     "multi-model-source-validation": "all-models",
+    "google-search-validation": "google-search",
     "final-source-verification": "claude"
   },
   "email": {
@@ -17,6 +18,7 @@
     "validate-response": "gemini",
     "craft-response": "gpt",
     "multi-model-source-validation": "all-models",
+    "google-search-validation": "google-search",
     "final-source-verification": "claude"
   },
   "research": {
@@ -28,6 +30,7 @@
     "strategic-synthesis": "gpt",
     "final-report": "claude",
     "multi-model-source-validation": "all-models",
+    "google-search-validation": "google-search",
     "final-source-verification": "claude"
   },
   "routing": {
@@ -62,6 +65,7 @@
       "final-logic-check": "claude",
       "production-ready": "gpt",
       "multi-model-source-validation": "all-models",
+      "google-search-validation": "google-search",
       "final-source-verification": "claude"
     },
     "email": {
@@ -69,6 +73,7 @@
       "validate-response": "gemini",
       "craft-response": "gpt",
       "multi-model-source-validation": "all-models",
+      "google-search-validation": "google-search",
       "final-source-verification": "claude"
     },
     "research": {
@@ -80,6 +85,7 @@
       "strategic-synthesis": "gpt",
       "final-report": "claude",
       "multi-model-source-validation": "all-models",
+      "google-search-validation": "google-search",
       "final-source-verification": "claude"
     }
   },
@@ -143,12 +149,18 @@
       "minimumAgreement": 2,
       "conflictResolution": "claude"
     },
+    "googleSearchValidation": {
+      "maxParallelSearches": 10,
+      "searchTimeout": 30000,
+      "retryAttempts": 2,
+      "invalidSourceThreshold": 0.3
+    },
     "sourceValidationPrompts": {
       "gpt": "As GPT, perform rigorous fact-checking on the sources and claims in the following content. Focus on logical consistency, factual accuracy, and identifying any potential misinformation. List each source/claim with your assessment:\n\n{{content}}",
       "claude": "As Claude, analyze the following content for source reliability and logical reasoning. Identify any potential hallucinations, unsupported claims, or questionable sources. Provide detailed reasoning for each assessment:\n\n{{content}}",
       "gemini": "As Gemini with access to vast document analysis capabilities, verify the sources and factual claims in the following content. Cross-reference with your knowledge base and identify any inconsistencies or unreliable sources:\n\n{{content}}",
       "grok": "As Grok with real-time web access, validate the sources and current information in the following content. Check for accuracy, recency, and reliability of claims, especially those related to recent events or data:\n\n{{content}}"
     },
-    "finalVerificationPrompt": "You are Claude, the most reliable reasoning model. You have received source validation assessments from all 4 AI models (GPT, Claude, Gemini, and Grok). Your task is to:\n\n1. Analyze all validation reports with special trust for Grok and Gemini's source assessments\n2. Identify any hallucinated or unreliable sources that need removal\n3. Provide a final cleaned version of the content with problematic sources removed\n4. List what changes were made and why\n\nValidation Reports:\nGPT Assessment: {{gptValidation}}\nClaude Assessment: {{claudeValidation}}\nGemini Assessment: {{geminiValidation}}\nGrok Assessment: {{grokValidation}}\n\nOriginal Content:\n{{originalContent}}\n\nProvide your final verified content and change summary."
+    "finalVerificationPrompt": "You are Claude, the most reliable reasoning model. You have received source validation assessments from all 4 AI models (GPT, Claude, Gemini, and Grok), plus Google Search validation results. Your task is to:\n\n1. Analyze all validation reports with special trust for Grok and Gemini's source assessments\n2. Review Google Search validation results for definitive source verification\n3. Identify any hallucinated or unreliable sources that need removal\n4. Provide a final cleaned version of the content with problematic sources removed\n5. List what changes were made and why\n\nValidation Reports:\nGPT Assessment: {{gptValidation}}\nClaude Assessment: {{claudeValidation}}\nGemini Assessment: {{geminiValidation}}\nGrok Assessment: {{grokValidation}}\nGoogle Search Results: {{googleSearchValidation}}\n\nOriginal Content:\n{{originalContent}}\n\nProvide your final verified content and change summary."
   }
 }

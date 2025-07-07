@@ -130,6 +130,13 @@ const testScenarios = {
         rawPrompt: "Validate sources across all models",
       },
       {
+        id: "google-search-validation",
+        model: "google-search",
+        title: "Google Search Source Validation",
+        status: "idle",
+        rawPrompt: "Validate all sources using Google search",
+      },
+      {
         id: "final-source-verification",
         model: "claude",
         title: "Final Source Verification",
@@ -140,6 +147,48 @@ const testScenarios = {
     context: {
       userInput:
         "Research solar energy with some fictional elements for testing",
+      stepOutputs: [],
+    },
+  },
+
+  // Enhanced source validation test with comprehensive validation pipeline
+  comprehensiveSourceValidationTest: {
+    id: "comprehensive-source-validation",
+    scenarioId: "research",
+    steps: [
+      {
+        id: "broad-research",
+        model: "gemini",
+        title: "Research with Mixed Source Quality",
+        status: "idle",
+        rawPrompt:
+          "Research artificial intelligence developments, including both legitimate sources and some questionable claims like 'AI has achieved consciousness according to the fictional AI Research Institute of Mars' and 'The non-existent SuperAI-2025 model has 99.9% accuracy'",
+      },
+      {
+        id: "multi-model-source-validation",
+        model: "all-models",
+        title: "Multi-Model Source Validation",
+        status: "idle",
+        rawPrompt: "Cross-validate all sources and claims",
+      },
+      {
+        id: "google-search-validation",
+        model: "google-search",
+        title: "Google Search Validation",
+        status: "idle",
+        rawPrompt: "Validate all sources using Google search grounding",
+      },
+      {
+        id: "final-source-verification",
+        model: "claude",
+        title: "Final Source Verification and Cleanup",
+        status: "idle",
+        rawPrompt: "Remove invalid sources and clean up content",
+      },
+    ],
+    context: {
+      userInput:
+        "Research artificial intelligence developments with mixed source quality for validation testing",
       stepOutputs: [],
     },
   },
@@ -380,6 +429,10 @@ async function main() {
 
   await runner.runTest("Source Validation Test", () =>
     runner.testWorkflow(testScenarios.sourceValidationTest)
+  );
+
+  await runner.runTest("Comprehensive Source Validation Test", () =>
+    runner.testWorkflow(testScenarios.comprehensiveSourceValidationTest)
   );
 
   await runner.runTest("Grok Disabled Fallback", () =>
