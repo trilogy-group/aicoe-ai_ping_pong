@@ -14,6 +14,8 @@ import { getAllScenarios } from "./lib/prompts";
 import ReactMarkdown from "react-markdown";
 import Guide from "./components/Guide";
 import DataDocs from "./components/DataDocs";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AuthButton from "./components/AuthButton";
 
 function App() {
   const COLORS = {
@@ -307,7 +309,7 @@ Ready to start the rally?`,
   }
 
   return (
-    <>
+    <ProtectedRoute>
       {showDisclaimer && (
         <div
           className="relative bg-amber-100 text-amber-800 text-sm px-3 py-2 text-center"
@@ -719,12 +721,18 @@ Ready to start the rally?`,
 
         {/* Header */}
         <div className="relative z-10 text-center pt-2 pb-2">
-          <h1
-            className="text-3xl font-bold mb-4"
-            style={{ fontFamily: "Space Grotesk, monospace" }}
-          >
-            AI Ping-Pong Studio
-          </h1>
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex-1"></div>
+            <h1
+              className="text-3xl font-bold"
+              style={{ fontFamily: "Space Grotesk, monospace" }}
+            >
+              AI Ping-Pong Studio
+            </h1>
+            <div className="flex-1 flex justify-end">
+              <AuthButton />
+            </div>
+          </div>
 
           {/* Model LEDs */}
           <div className="flex items-center justify-center space-x-3">
@@ -1087,7 +1095,7 @@ Ready to start the rally?`,
           <span>Docs</span>
         </button>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }
 
