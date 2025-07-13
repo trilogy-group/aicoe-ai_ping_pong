@@ -246,9 +246,9 @@ Write a short, vivid, narrative scenario (~200 words) for a section called "A Gl
   // LEGACY WORKFLOWS (kept for backward compatibility)
   email: {
     id: "email",
-    name: "Email Response Workflow",
-    description: "3-step AI workflow for crafting thoughtful email responses",
-    estimatedMinutes: 8,
+    name: "Email Response Workflow (Enhanced)",
+    description: "4-step AI workflow with comprehensive validation for professional email responses",
+    estimatedMinutes: 10,
     steps: [
       {
         id: "decode-request",
@@ -285,32 +285,104 @@ Keep this quick and practical.`,
       {
         id: "validate-response",
         model: "gemini",
-        title: "Validate Response",
-        description: "Fact-check and verify accuracy",
-        timeEstimate: 3,
+        title: "Comprehensive Email Validation",
+        description: "Advanced fact-checking, policy verification, and risk assessment",
+        timeEstimate: 5,
         status: "idle",
-        rawPrompt: `Original email: {{userInput}}
+        rawPrompt: `You are a comprehensive email validation specialist with Google search access. Perform thorough verification before crafting the response.
 
-My understanding: {{step1}}
+ORIGINAL EMAIL: {{userInput}}
+INITIAL UNDERSTANDING: {{step1}}
 
-Before I respond, verify:
-- Are there any facts I should double-check?
-- Any company policies or procedures I should reference?
-- Any recent developments that might affect my response?
-- Any potential sensitivity or escalation risks?
+COMPREHENSIVE VALIDATION PROTOCOL:
+1. FACT VERIFICATION
+   - Verify any dates, deadlines, or timelines mentioned
+   - Check any statistical claims or data points
+   - Validate any references to events, policies, or procedures
+   - Cross-check any technical information or specifications
 
-Give me current, accurate information with sources where relevant.`,
-        prompt: `Original email: {{userInput}}
+2. POLICY & PROCEDURE VALIDATION
+   - Search for relevant company policies or industry standards
+   - Check for any recent policy updates or changes
+   - Verify compliance requirements if applicable
+   - Identify any legal or regulatory considerations
 
-My understanding: {{step1}}
+3. CURRENT DEVELOPMENTS CHECK
+   - Search for recent news or developments affecting the topic
+   - Check for any industry changes or updates
+   - Verify any external factors that might impact the response
+   - Look for any breaking news or urgent updates
 
-Before I respond, verify:
-- Are there any facts I should double-check?
-- Any company policies or procedures I should reference?
-- Any recent developments that might affect my response?
-- Any potential sensitivity or escalation risks?
+4. SENSITIVITY & RISK ASSESSMENT
+   - Identify potential escalation risks or sensitive topics
+   - Check for any ongoing controversies or issues
+   - Assess reputation risks or public relations considerations
+   - Evaluate potential legal or compliance implications
 
-Give me current, accurate information with sources where relevant.`,
+5. CONTEXTUAL INTELLIGENCE
+   - Research the sender's background or organization if relevant
+   - Check for any relevant history or previous communications
+   - Identify any cultural or industry-specific considerations
+   - Assess the urgency and priority level accurately
+
+COMPREHENSIVE VALIDATION REPORT:
+FACT_VERIFICATION: [All facts checked with sources and accuracy assessment]
+POLICY_COMPLIANCE: [Relevant policies, procedures, and compliance requirements]
+CURRENT_CONTEXT: [Recent developments, news, or changes affecting the topic]
+RISK_ASSESSMENT: [Potential risks, sensitivities, and escalation factors]
+BACKGROUND_INTEL: [Relevant context about sender, organization, or situation]
+VERIFICATION_SOURCES: [List of sources used for verification with reliability ratings]
+RESPONSE_STRATEGY: [Recommended approach based on validation findings]
+CRITICAL_CONSIDERATIONS: [Most important factors to address in response]
+
+Use Google search extensively to ensure all information is current, accurate, and comprehensive.`,
+        prompt: `You are a comprehensive email validation specialist with Google search access. Perform thorough verification before crafting the response.
+
+ORIGINAL EMAIL: {{userInput}}
+INITIAL UNDERSTANDING: {{step1}}
+
+COMPREHENSIVE VALIDATION PROTOCOL:
+1. FACT VERIFICATION
+   - Verify any dates, deadlines, or timelines mentioned
+   - Check any statistical claims or data points
+   - Validate any references to events, policies, or procedures
+   - Cross-check any technical information or specifications
+
+2. POLICY & PROCEDURE VALIDATION
+   - Search for relevant company policies or industry standards
+   - Check for any recent policy updates or changes
+   - Verify compliance requirements if applicable
+   - Identify any legal or regulatory considerations
+
+3. CURRENT DEVELOPMENTS CHECK
+   - Search for recent news or developments affecting the topic
+   - Check for any industry changes or updates
+   - Verify any external factors that might impact the response
+   - Look for any breaking news or urgent updates
+
+4. SENSITIVITY & RISK ASSESSMENT
+   - Identify potential escalation risks or sensitive topics
+   - Check for any ongoing controversies or issues
+   - Assess reputation risks or public relations considerations
+   - Evaluate potential legal or compliance implications
+
+5. CONTEXTUAL INTELLIGENCE
+   - Research the sender's background or organization if relevant
+   - Check for any relevant history or previous communications
+   - Identify any cultural or industry-specific considerations
+   - Assess the urgency and priority level accurately
+
+COMPREHENSIVE VALIDATION REPORT:
+FACT_VERIFICATION: [All facts checked with sources and accuracy assessment]
+POLICY_COMPLIANCE: [Relevant policies, procedures, and compliance requirements]
+CURRENT_CONTEXT: [Recent developments, news, or changes affecting the topic]
+RISK_ASSESSMENT: [Potential risks, sensitivities, and escalation factors]
+BACKGROUND_INTEL: [Relevant context about sender, organization, or situation]
+VERIFICATION_SOURCES: [List of sources used for verification with reliability ratings]
+RESPONSE_STRATEGY: [Recommended approach based on validation findings]
+CRITICAL_CONSIDERATIONS: [Most important factors to address in response]
+
+Use Google search extensively to ensure all information is current, accurate, and comprehensive.`,
       },
       {
         id: "craft-response",
@@ -345,6 +417,98 @@ Write a professional, helpful response that:
 - Feels personal and thoughtful
 
 Keep it concise but complete.`,
+      },
+      {
+        id: "final-email-validation",
+        model: "claude",
+        title: "Final Email Validation",
+        description: "Comprehensive validation of the drafted response",
+        timeEstimate: 2,
+        status: "idle",
+        rawPrompt: `You are a professional communication validator. Review the drafted email response for accuracy, appropriateness, and effectiveness.
+
+ORIGINAL EMAIL: {{userInput}}
+VALIDATION RESEARCH: {{step2}}
+DRAFTED RESPONSE: {{step3}}
+
+FINAL VALIDATION CHECKLIST:
+1. ACCURACY VERIFICATION
+   - All facts and information are correct and current
+   - No contradictions with the validation research
+   - All claims are properly supported
+
+2. TONE & APPROPRIATENESS
+   - Professional and suitable for the context
+   - Matches the urgency and formality level needed
+   - Culturally and situationally appropriate
+
+3. COMPLETENESS & CLARITY
+   - All questions and requests are addressed
+   - Information is clear and unambiguous
+   - No important details are missing
+
+4. RISK ASSESSMENT
+   - No potential for misinterpretation
+   - No legal, compliance, or reputation risks
+   - Appropriate level of commitment and responsibility
+
+5. EFFECTIVENESS EVALUATION
+   - Likely to achieve the desired outcome
+   - Maintains positive relationships
+   - Sets appropriate expectations
+
+VALIDATION ASSESSMENT:
+ACCURACY_CHECK: [All facts verified and current]
+TONE_APPROPRIATENESS: [Professional and context-appropriate]
+COMPLETENESS_RATING: [All requirements addressed]
+RISK_EVALUATION: [No significant risks identified]
+EFFECTIVENESS_SCORE: [Likely to achieve objectives]
+FINAL_RECOMMENDATION: [SEND_AS_IS/MINOR_REVISIONS/MAJOR_REVISIONS]
+IMPROVEMENT_SUGGESTIONS: [Specific recommendations if any]
+
+If revisions are needed, provide the corrected version.`,
+        prompt: `You are a professional communication validator. Review the drafted email response for accuracy, appropriateness, and effectiveness.
+
+ORIGINAL EMAIL: {{userInput}}
+VALIDATION RESEARCH: {{step2}}
+DRAFTED RESPONSE: {{step3}}
+
+FINAL VALIDATION CHECKLIST:
+1. ACCURACY VERIFICATION
+   - All facts and information are correct and current
+   - No contradictions with the validation research
+   - All claims are properly supported
+
+2. TONE & APPROPRIATENESS
+   - Professional and suitable for the context
+   - Matches the urgency and formality level needed
+   - Culturally and situationally appropriate
+
+3. COMPLETENESS & CLARITY
+   - All questions and requests are addressed
+   - Information is clear and unambiguous
+   - No important details are missing
+
+4. RISK ASSESSMENT
+   - No potential for misinterpretation
+   - No legal, compliance, or reputation risks
+   - Appropriate level of commitment and responsibility
+
+5. EFFECTIVENESS EVALUATION
+   - Likely to achieve the desired outcome
+   - Maintains positive relationships
+   - Sets appropriate expectations
+
+VALIDATION ASSESSMENT:
+ACCURACY_CHECK: [All facts verified and current]
+TONE_APPROPRIATENESS: [Professional and context-appropriate]
+COMPLETENESS_RATING: [All requirements addressed]
+RISK_EVALUATION: [No significant risks identified]
+EFFECTIVENESS_SCORE: [Likely to achieve objectives]
+FINAL_RECOMMENDATION: [SEND_AS_IS/MINOR_REVISIONS/MAJOR_REVISIONS]
+IMPROVEMENT_SUGGESTIONS: [Specific recommendations if any]
+
+If revisions are needed, provide the corrected version.`,
       },
     ],
   },

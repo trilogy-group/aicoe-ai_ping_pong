@@ -28,8 +28,9 @@ app.use(
 app.use(cors({
   origin: process.env.NODE_ENV === "production" 
     ? ["https://your-domain.com"] 
-    : ["http://localhost:3000", "http://localhost:3002"],
+    : ["http://localhost:3000", "http://localhost:3002", "http://127.0.0.1:3000"],
   credentials: true,
+  optionsSuccessStatus: 200,
 }));
 app.use(express.json({ limit: "50mb" }));
 app.use(passport.initialize());
@@ -703,77 +704,273 @@ class WorkflowEngine {
   }
 
   async executeMultiModelValidation(prompt, context) {
-    console.log(`🔍 Starting multi-model source validation with search`);
+    console.log(`🔍 Starting ENHANCED multi-model source validation with advanced search`);
 
+    // Enhanced validation configuration with specialized prompts
     const validationConfig = {
-      gpt: "As GPT with web search capabilities, perform rigorous fact-checking on the sources and claims in the following content. Use search to verify facts and cross-check sources. Focus on logical consistency, factual accuracy, and identifying any potential misinformation. Include source citations for your verification:\n\n{{content}}",
-      claude:
-        "As Claude with thinking and web search, analyze the following content for source reliability and logical reasoning. Use search to verify claims and sources. Identify any potential hallucinations, unsupported claims, or questionable sources. Provide detailed reasoning for each assessment with citations:\n\n{{content}}",
-      gemini:
-        "As Gemini with Google grounding search, verify the sources and factual claims in the following content. Use grounding search to cross-reference with current information and identify any inconsistencies or unreliable sources. Include source citations:\n\n{{content}}",
-      grok: "As Grok with real-time web access and deep search, validate the sources and current information in the following content. Use your native search capabilities to check for accuracy, recency, and reliability of claims, especially those related to recent events or data. Include source citations:\n\n{{content}}",
+      gpt: `You are GPT, an expert fact-checker with web search capabilities. Perform comprehensive source validation and fact-checking.
+
+CONTENT TO VALIDATE: {{content}}
+
+ENHANCED VALIDATION PROTOCOL:
+1. SOURCE AUTHENTICITY
+   - Verify each source exists and is legitimate
+   - Check if sources are being cited accurately
+   - Identify any fabricated or questionable sources
+
+2. FACTUAL ACCURACY ASSESSMENT
+   - Cross-check all statistical claims against multiple sources
+   - Verify dates, numbers, and specific facts
+   - Identify any outdated or incorrect information
+
+3. LOGICAL CONSISTENCY ANALYSIS
+   - Check for internal contradictions
+   - Verify cause-effect relationships claimed
+   - Assess reasoning quality and logical flow
+
+4. BIAS & MISINFORMATION DETECTION
+   - Identify potential bias in source selection
+   - Look for signs of selective fact presentation
+   - Flag any known misinformation patterns
+
+ENHANCED ASSESSMENT FORMAT:
+OVERALL_CONFIDENCE: [1-10]
+SOURCE_AUTHENTICITY: [Verified/Questionable/Invalid sources identified]
+FACTUAL_ACCURACY: [Specific claims verified/contradicted]
+LOGICAL_CONSISTENCY: [Assessment of reasoning quality]
+BIAS_INDICATORS: [Any bias patterns detected]
+MISINFORMATION_FLAGS: [Potential misinformation identified]
+VERIFICATION_EVIDENCE: [Search results supporting assessment]
+IMPROVEMENT_RECOMMENDATIONS: [Specific suggestions for better sourcing]`,
+
+      claude: `You are Claude, a meticulous source reliability analyst with thinking and web search capabilities. Conduct deep analysis of source credibility and reasoning.
+
+CONTENT TO VALIDATE: {{content}}
+
+ADVANCED ANALYSIS REQUIREMENTS:
+1. SOURCE CREDIBILITY MATRIX
+   - Evaluate each source's reputation and reliability
+   - Assess author credentials and expertise
+   - Check for conflicts of interest or bias
+
+2. EVIDENCE QUALITY ASSESSMENT
+   - Analyze methodology behind cited studies
+   - Evaluate sample sizes and research quality
+   - Check for peer review and replication
+
+3. REASONING ARCHITECTURE REVIEW
+   - Examine argument structure and logic
+   - Identify assumptions and unsupported leaps
+   - Assess evidence-to-conclusion ratios
+
+4. CROSS-REFERENCE VALIDATION
+   - Compare claims against multiple independent sources
+   - Look for consensus or significant disagreement
+   - Identify any outlier claims needing verification
+
+DETAILED ANALYSIS FORMAT:
+RELIABILITY_MATRIX: [Source-by-source credibility assessment]
+EVIDENCE_QUALITY: [Methodology and research quality evaluation]
+REASONING_STRUCTURE: [Logic and argument analysis]
+CROSS_VALIDATION: [Independent source confirmation]
+CREDIBILITY_CONCERNS: [Specific reliability issues identified]
+SUPPORTING_EVIDENCE: [Search results confirming analysis]
+ENHANCEMENT_PRIORITIES: [Key areas needing improvement]`,
+
+      gemini: `You are Gemini, a comprehensive research validator with Google grounding search. Leverage your massive context and search capabilities for thorough verification.
+
+CONTENT TO VALIDATE: {{content}}
+
+COMPREHENSIVE VERIFICATION PROTOCOL:
+1. MASSIVE SCALE CROSS-REFERENCING
+   - Search across thousands of sources for each claim
+   - Compare against academic databases and repositories
+   - Verify against government and institutional sources
+
+2. TEMPORAL ACCURACY VERIFICATION
+   - Check if information is current and up-to-date
+   - Identify any superseded or outdated claims
+   - Verify timeline accuracy for historical claims
+
+3. EXPERT CONSENSUS ANALYSIS
+   - Search for expert opinions and scientific consensus
+   - Identify any controversial or disputed claims
+   - Check for recent developments affecting validity
+
+4. INSTITUTIONAL SOURCE VALIDATION
+   - Verify credentials of institutions cited
+   - Check for any retractions or corrections
+   - Assess institutional reputation and standing
+
+COMPREHENSIVE ASSESSMENT:
+SCALE_VERIFICATION: [Large-scale cross-reference results]
+TEMPORAL_ACCURACY: [Currency and timeline verification]
+EXPERT_CONSENSUS: [Scientific/expert community alignment]
+INSTITUTIONAL_VALIDATION: [Institutional source credibility]
+DISPUTED_CLAIMS: [Any controversial or disputed information]
+SEARCH_EVIDENCE: [Extensive search results summary]
+VERIFICATION_GAPS: [Areas needing additional verification]`,
+
+      grok: `You are Grok, a real-time information specialist with advanced web search and current data access. Focus on live verification and current developments.
+
+CONTENT TO VALIDATE: {{content}}
+
+REAL-TIME VALIDATION FOCUS:
+1. CURRENT EVENT VERIFICATION
+   - Check latest news and developments
+   - Verify any claims about recent events
+   - Identify any rapidly changing information
+
+2. LIVE DATA VALIDATION
+   - Verify current statistics and metrics
+   - Check for recent updates to data cited
+   - Identify any market or trend changes affecting claims
+
+3. SOCIAL PROOF & SENTIMENT ANALYSIS
+   - Check current social media and public discourse
+   - Identify any ongoing debates or controversies
+   - Assess current expert opinions and reactions
+
+4. BREAKING DEVELOPMENT IMPACT
+   - Search for any recent developments affecting claims
+   - Check for breaking news that might contradict content
+   - Identify any emerging trends or new information
+
+REAL-TIME ASSESSMENT:
+CURRENT_ACCURACY: [Real-time verification of recent claims]
+LIVE_DATA_CHECK: [Current statistics and data verification]
+SOCIAL_VALIDATION: [Public discourse and expert sentiment]
+RECENT_DEVELOPMENTS: [Any breaking news or updates affecting content]
+TREND_ANALYSIS: [Current trends supporting or contradicting claims]
+LIVE_EVIDENCE: [Real-time search results and verification]
+URGENCY_FLAGS: [Any urgent corrections or updates needed]`
     };
 
     const models = ["gpt", "claude", "gemini", "grok"];
     const validationResults = {};
+    const detailedAssessments = {};
 
-    // Run validation in parallel across all enabled models WITH SEARCH
+    // Run enhanced validation in parallel with specialized focus
     const validationPromises = models
       .filter((model) => modelsConfig.enabledDrivers[model])
       .map(async (model) => {
         try {
           console.log(
-            `🔍 Running ${model.toUpperCase()} validation with search`
+            `🔍 Running ENHANCED ${model.toUpperCase()} validation with specialized search`
           );
+          
           const validationPrompt = this.renderPrompt(
             validationConfig[model],
             context
           );
-          // Use search for all validation models
+          
+          // Use search for all validation models with longer timeout
+          const startTime = Date.now();
           const result = await modelHandlers[model](
             validationPrompt,
             context,
             true
           );
+          const duration = Date.now() - startTime;
 
           validationResults[model] = result;
+          
+          // Extract structured assessment data
+          detailedAssessments[model] = {
+            model: model.toUpperCase(),
+            result: result,
+            duration: duration,
+            length: result.length,
+            timestamp: new Date().toISOString(),
+            focus: this.getModelValidationFocus(model)
+          };
+
           console.log(
-            `✅ ${model.toUpperCase()} validation complete with search (${
-              result.length
-            } chars)`
+            `✅ ENHANCED ${model.toUpperCase()} validation complete (${duration}ms, ${result.length} chars)`
           );
         } catch (error) {
           console.error(
-            `❌ ${model.toUpperCase()} validation failed:`,
+            `❌ ENHANCED ${model.toUpperCase()} validation failed:`,
             error.message
           );
-          validationResults[model] = `Validation failed: ${error.message}`;
+          validationResults[model] = `Enhanced validation failed: ${error.message}`;
+          detailedAssessments[model] = {
+            model: model.toUpperCase(),
+            result: `Validation failed: ${error.message}`,
+            duration: 0,
+            error: error.message,
+            timestamp: new Date().toISOString()
+          };
         }
       });
 
     await Promise.all(validationPromises);
 
-    // Store validation results in context for next step
-    context.validationResults = validationResults;
-    context.originalContent =
-      context.stepOutputs[context.stepOutputs.length - 1];
+    // Enhanced result synthesis
+    const synthesisPrompt = `You are a master validation synthesizer. Analyze and synthesize the results from multiple AI model validations.
 
-    // Return validation summary
-    const summaryText =
-      `Multi-model source validation with search completed:\n\n` +
-      Object.entries(validationResults)
-        .map(
-          ([model, result]) =>
-            `${model.toUpperCase()} Assessment with Search (${
-              result.length
-            } chars):\n${result.substring(0, 200)}...`
-        )
-        .join("\n\n");
+VALIDATION RESULTS:
+${Object.entries(validationResults).map(([model, result]) => `
+${model.toUpperCase()} VALIDATION:
+${result}
+---`).join('\n')}
+
+SYNTHESIS REQUIREMENTS:
+1. Identify consensus across models
+2. Highlight any disagreements or contradictions
+3. Assess overall confidence in content validity
+4. Prioritize most critical issues identified
+5. Provide actionable recommendations
+
+SYNTHESIS FORMAT:
+CONSENSUS_FINDINGS: [Points where all models agree]
+DISAGREEMENTS: [Areas where models disagree]
+CONFIDENCE_ASSESSMENT: [Overall confidence in content validity 1-10]
+CRITICAL_ISSUES: [Most important problems identified]
+SOURCE_RELIABILITY: [Overall assessment of sources used]
+FACT_ACCURACY: [Factual accuracy assessment]
+ACTIONABLE_RECOMMENDATIONS: [Specific steps to improve content]
+VALIDATION_SUMMARY: [Executive summary of findings]`;
+
+    const synthesis = await modelHandlers.claude(synthesisPrompt, {}, false);
+
+    // Store enhanced validation results in context
+    context.validationResults = validationResults;
+    context.detailedAssessments = detailedAssessments;
+    context.validationSynthesis = synthesis;
+    context.originalContent = context.stepOutputs[context.stepOutputs.length - 1];
+
+    // Return enhanced validation summary
+    const summaryText = `ENHANCED Multi-Model Source Validation Complete:
+
+🔍 VALIDATION SCOPE: ${Object.keys(validationResults).length} AI models with specialized search
+📊 TOTAL ANALYSIS: ${Object.values(validationResults).reduce((sum, result) => sum + result.length, 0)} characters of detailed assessment
+
+${synthesis}
+
+📋 DETAILED MODEL ASSESSMENTS:
+${Object.entries(detailedAssessments)
+  .map(([model, assessment]) => 
+    `${assessment.model}: ${assessment.focus} (${assessment.length} chars, ${assessment.duration}ms)`
+  ).join('\n')}
+
+✅ Enhanced validation synthesis complete with actionable recommendations.`;
 
     return summaryText;
   }
 
-  // NEW: Extract sources from content using comprehensive patterns
+  // NEW: Get model validation focus description
+  getModelValidationFocus(model) {
+    const focusMap = {
+      'gpt': 'Fact-checking & logical consistency',
+      'claude': 'Source credibility & reasoning analysis', 
+      'gemini': 'Large-scale cross-referencing & institutional validation',
+      'grok': 'Real-time verification & current developments'
+    };
+    return focusMap[model] || 'General validation';
+  }
+
+  // ENHANCED: Extract sources from content using comprehensive patterns
   extractSourcesFromContent(content) {
     // Handle undefined or null content
     if (!content || typeof content !== "string") {
@@ -782,146 +979,424 @@ class WorkflowEngine {
     }
 
     const sources = new Set();
+    const extractedSources = [];
 
-    // Pattern 1: URLs (http/https)
+    // Pattern 1: URLs (http/https) with context
     const urlPattern = /https?:\/\/[^\s\)\]\}\<\>\n]+/g;
     const urls = content.match(urlPattern) || [];
-    urls.forEach((url) => sources.add(url.replace(/[.,;:!?]*$/, ""))); // Remove trailing punctuation
+    urls.forEach((url) => {
+      const cleanUrl = url.replace(/[.,;:!?]*$/, "");
+      sources.add(cleanUrl);
+      extractedSources.push({
+        source: cleanUrl,
+        type: 'url',
+        pattern: 'direct_link',
+        confidence: 0.9
+      });
+    });
 
-    // Pattern 2: [Source: ...] format
+    // Pattern 2: [Source: ...] format (enhanced)
     const sourcePattern1 = /\[Source:\s*([^\]]+)\]/gi;
     const sourceMatches1 = content.matchAll(sourcePattern1);
     for (const match of sourceMatches1) {
-      sources.add(match[1].trim());
+      const source = match[1].trim();
+      sources.add(source);
+      extractedSources.push({
+        source,
+        type: 'citation',
+        pattern: 'bracket_source',
+        confidence: 0.95
+      });
     }
 
-    // Pattern 3: (Source: ...) format
+    // Pattern 3: (Source: ...) format (enhanced)
     const sourcePattern2 = /\(Source:\s*([^\)]+)\)/gi;
     const sourceMatches2 = content.matchAll(sourcePattern2);
     for (const match of sourceMatches2) {
-      sources.add(match[1].trim());
+      const source = match[1].trim();
+      sources.add(source);
+      extractedSources.push({
+        source,
+        type: 'citation',
+        pattern: 'paren_source',
+        confidence: 0.95
+      });
     }
 
-    // Pattern 4: According to [source]
-    const accordingPattern = /According to\s+([^,.\n]+)/gi;
+    // Pattern 4: "According to [source]" (enhanced)
+    const accordingPattern = /According to\s+([^,.\n]{5,100})/gi;
     const accordingMatches = content.matchAll(accordingPattern);
     for (const match of accordingMatches) {
-      sources.add(match[1].trim());
+      const source = match[1].trim();
+      sources.add(source);
+      extractedSources.push({
+        source,
+        type: 'attribution',
+        pattern: 'according_to',
+        confidence: 0.85
+      });
     }
 
-    // Pattern 5: As reported by [source]
-    const reportedPattern = /As reported by\s+([^,.\n]+)/gi;
+    // Pattern 5: "As reported by [source]" (enhanced)
+    const reportedPattern = /As reported by\s+([^,.\n]{5,100})/gi;
     const reportedMatches = content.matchAll(reportedPattern);
     for (const match of reportedMatches) {
-      sources.add(match[1].trim());
+      const source = match[1].trim();
+      sources.add(source);
+      extractedSources.push({
+        source,
+        type: 'attribution',
+        pattern: 'reported_by',
+        confidence: 0.85
+      });
     }
 
-    // Pattern 6: [Author/Publication] states/reports/claims
-    const authorPattern =
-      /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+(?:states|reports|claims|found|discovered|published)/g;
+    // Pattern 6: [Author/Publication] states/reports/claims (enhanced)
+    const authorPattern = /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*(?:\s+(?:University|Institute|Foundation|Corporation|Company|Organization|Journal|Magazine|Times|Post|News))?)\s+(?:states|reports|claims|found|discovered|published|concluded|determined)/gi;
     const authorMatches = content.matchAll(authorPattern);
     for (const match of authorMatches) {
-      if (match[1].length > 3 && match[1].length < 50) {
-        // Reasonable length check
-        sources.add(match[1].trim());
+      const source = match[1].trim();
+      if (source.length > 3 && source.length < 80) {
+        sources.add(source);
+        extractedSources.push({
+          source,
+          type: 'author_citation',
+          pattern: 'author_verb',
+          confidence: 0.75
+        });
       }
     }
 
-    // Pattern 7: Study/Research/Report references
-    const studyPattern =
-      /(?:study|research|report|paper|article)\s+(?:by|from|published by)\s+([^,.\n]+)/gi;
+    // Pattern 7: Study/Research/Report references (enhanced)
+    const studyPattern = /(?:study|research|report|paper|article|survey|analysis)\s+(?:by|from|published by|conducted by)\s+([^,.\n]{5,100})/gi;
     const studyMatches = content.matchAll(studyPattern);
     for (const match of studyMatches) {
-      sources.add(match[1].trim());
+      const source = match[1].trim();
+      sources.add(source);
+      extractedSources.push({
+        source,
+        type: 'study_citation',
+        pattern: 'study_reference',
+        confidence: 0.80
+      });
     }
 
-    console.log(`🔍 Extracted ${sources.size} sources from content`);
-    return Array.from(sources).filter((source) => source.length > 2); // Filter out very short matches
+    // Pattern 8: Journal and academic citations
+    const journalPattern = /(Journal of [^,.\n]{5,80}|[A-Z][a-z]+\s+Journal|Nature|Science|Cell|The Lancet|NEJM|Harvard Business Review)/gi;
+    const journalMatches = content.matchAll(journalPattern);
+    for (const match of journalMatches) {
+      const source = match[1].trim();
+      sources.add(source);
+      extractedSources.push({
+        source,
+        type: 'journal_citation',
+        pattern: 'academic_journal',
+        confidence: 0.90
+      });
+    }
+
+    // Pattern 9: Data from [source] patterns
+    const dataPattern = /(?:data from|statistics from|information from|figures from)\s+([^,.\n]{5,100})/gi;
+    const dataMatches = content.matchAll(dataPattern);
+    for (const match of dataMatches) {
+      const source = match[1].trim();
+      sources.add(source);
+      extractedSources.push({
+        source,
+        type: 'data_citation',
+        pattern: 'data_from',
+        confidence: 0.85
+      });
+    }
+
+    // Pattern 10: Research by/from organization patterns
+    const orgPattern = /(?:research by|study by|report from|data from)\s+([A-Z][a-zA-Z\s&]{5,80}(?:Inc|LLC|Corp|Organization|Institute|Foundation|University|College))/gi;
+    const orgMatches = content.matchAll(orgPattern);
+    for (const match of orgMatches) {
+      const source = match[1].trim();
+      sources.add(source);
+      extractedSources.push({
+        source,
+        type: 'organization_citation',
+        pattern: 'org_research',
+        confidence: 0.88
+      });
+    }
+
+    // Pattern 11: Expert quotes with attribution
+    const expertPattern = /([A-Z][a-z]+\s+[A-Z][a-z]+),\s+(?:CEO|CTO|Director|Professor|Researcher|Analyst|Expert|Scientist|Author)\s+(?:at|of|from)\s+([^,.\n]{3,50})/gi;
+    const expertMatches = content.matchAll(expertPattern);
+    for (const match of expertMatches) {
+      const source = `${match[1]}, ${match[2]}`;
+      sources.add(source);
+      extractedSources.push({
+        source,
+        type: 'expert_citation',
+        pattern: 'expert_quote',
+        confidence: 0.82
+      });
+    }
+
+    const sourceArray = Array.from(sources).filter((source) => source.length > 2);
+    
+    console.log(`🔍 Extracted ${sourceArray.length} sources from content using ${extractedSources.length} pattern matches`);
+    console.log(`📊 Source pattern breakdown: ${this.getSourcePatternBreakdown(extractedSources)}`);
+    
+    return sourceArray;
   }
 
-  // NEW: Validate a single source using Google search
+  // NEW: Get breakdown of source patterns for analysis
+  getSourcePatternBreakdown(extractedSources) {
+    const breakdown = {};
+    extractedSources.forEach(item => {
+      breakdown[item.pattern] = (breakdown[item.pattern] || 0) + 1;
+    });
+    return Object.entries(breakdown).map(([pattern, count]) => `${pattern}:${count}`).join(', ');
+  }
+
+  // ENHANCED: Validate a single source using advanced multi-step validation
   async validateSingleSource(source, originalContent, retryAttempts = 2) {
     const config = modelsConfig.validationConfig.googleSearchValidation;
 
     for (let attempt = 0; attempt < retryAttempts; attempt++) {
       try {
         console.log(
-          `🔍 Validating source: "${source}" (attempt ${attempt + 1})`
+          `🔍 Advanced validating source: "${source}" (attempt ${attempt + 1})`
         );
 
-        const searchQuery = `"${source}" site verification reliability`;
-        const searchPrompt = `You are a fact-checker with Google search access. Validate the reliability and existence of this source: "${source}"
-        
-        Original context: ${originalContent.substring(0, 500)}...
-        
-        Use Google search to:
-        1. Verify if this source exists and is legitimate
-        2. Check the credibility and reliability of the source
-        3. Determine if the source actually contains the information claimed
-        4. Identify any red flags or signs of unreliability
-        
-        Search query: ${searchQuery}
-        
-        Provide your assessment in this format:
-        STATUS: [VALID/INVALID/QUESTIONABLE]
-        CONFIDENCE: [1-10]
-        REASON: [Brief explanation]
-        EVIDENCE: [What you found through search]
-        RECOMMENDATION: [Keep/Remove/Verify]`;
+        // Step 1: Initial credibility assessment based on source characteristics
+        const credibilityScore = this.assessSourceCredibility(source);
 
-        // Use web search to validate the source
-        const result = await this.searchWeb(searchQuery);
+        // Step 2: Multi-query search strategy
+        const searchQueries = [
+          `"${source}" reliability credibility verification`,
+          `"${source}" fact check accuracy review`,
+          `"${source}" bias check media literacy`,
+          `${source} site:wikipedia.org OR site:mediabiasfactcheck.com OR site:allsides.com`
+        ];
 
-        // Use Claude to analyze the search results
-        const analysisPrompt = `${searchPrompt}
+        const searchResults = [];
+        for (const query of searchQueries) {
+          try {
+            const result = await this.searchWeb(query);
+            searchResults.push({ query, result });
+          } catch (error) {
+            console.log(`⚠️ Search query failed: ${query}`);
+          }
+        }
+
+        // Step 3: Advanced analysis using multiple validation approaches
+        const validationPrompt = `You are an expert fact-checker and source validation specialist with access to multiple search results. Validate this source using comprehensive analysis.
+
+        SOURCE TO VALIDATE: "${source}"
+        INITIAL CREDIBILITY SCORE: ${credibilityScore.score}/100 (${credibilityScore.reasoning})
+        ORIGINAL CONTEXT: ${originalContent.substring(0, 500)}...
         
-        Search Results:
-        ${result}
+        SEARCH RESULTS FROM MULTIPLE QUERIES:
+        ${searchResults.map((sr, i) => `Query ${i+1}: ${sr.query}\nResults: ${sr.result}\n---`).join('\n')}
         
-        Based on these search results, provide your validation assessment.`;
+        COMPREHENSIVE VALIDATION REQUIREMENTS:
+        1. Source Existence & Authentication
+           - Does this source actually exist?
+           - Is it a real publication/organization/person?
+           - Are there any signs of fabrication?
+        
+        2. Credibility & Reliability Assessment
+           - What is the source's reputation in its field?
+           - What do fact-checkers say about this source?
+           - Any known bias or reliability issues?
+        
+        3. Content Verification
+           - Does the source contain information relevant to the context?
+           - Is the source being cited accurately?
+           - Are there contradictory reports about this source?
+        
+        4. Red Flags & Warning Signs
+           - Any known misinformation history?
+           - Questionable funding or affiliations?
+           - Consistent criticism from experts?
+        
+        5. Cross-Reference Validation
+           - How do other sources rate this source?
+           - Independent verification available?
+           - Consensus among multiple validators?
+        
+        ENHANCED ASSESSMENT FORMAT:
+        STATUS: [VERIFIED/QUESTIONABLE/INVALID/ERROR]
+        CONFIDENCE: [1-10] (where 10 = absolutely certain)
+        CREDIBILITY_RATING: [1-100] (overall source credibility)
+        EXISTENCE_CONFIRMED: [Yes/No/Unclear]
+        BIAS_LEVEL: [Low/Moderate/High/Extreme]
+        FACT_CHECK_RATING: [Excellent/Good/Mixed/Poor/Terrible]
+        REASON: [Detailed explanation of assessment]
+        EVIDENCE: [Key findings from search results]
+        RED_FLAGS: [List any concerning issues found]
+        CROSS_REFERENCES: [Other sources that validate or contradict]
+        RECOMMENDATION: [KEEP_WITH_CONFIDENCE/KEEP_WITH_CAUTION/VERIFY_FURTHER/REMOVE]
+        RELIABILITY_FACTORS: [List factors affecting reliability]`;
 
-        const analysis = await modelHandlers.claude(analysisPrompt, {}, false);
+        // Use Claude for deep analysis
+        const analysis = await modelHandlers.claude(validationPrompt, {}, false);
 
-        // Parse the analysis
-        const statusMatch = analysis.match(
-          /STATUS:\s*(VALID|INVALID|QUESTIONABLE)/i
-        );
-        const confidenceMatch = analysis.match(/CONFIDENCE:\s*(\d+)/);
-        const reasonMatch = analysis.match(/REASON:\s*([^\n]+)/);
-        const recommendationMatch = analysis.match(
-          /RECOMMENDATION:\s*(Keep|Remove|Verify)/i
-        );
-
-        return {
-          source,
-          status: statusMatch ? statusMatch[1].toUpperCase() : "QUESTIONABLE",
-          confidence: confidenceMatch ? parseInt(confidenceMatch[1]) : 5,
-          reason: reasonMatch ? reasonMatch[1].trim() : "Unable to determine",
-          evidence: result.substring(0, 300),
-          recommendation: recommendationMatch
-            ? recommendationMatch[1].toUpperCase()
-            : "VERIFY",
-          searchQuery,
-          analysis: analysis,
+        // Enhanced parsing with better error handling
+        const parseField = (fieldName, pattern, defaultValue) => {
+          const match = analysis.match(new RegExp(`${fieldName}:\\s*([^\n]+)`, 'i'));
+          return match ? match[1].trim() : defaultValue;
         };
+
+        const validation = {
+          source,
+          status: parseField('STATUS', '', 'QUESTIONABLE'),
+          confidence: parseInt(parseField('CONFIDENCE', '', '5')),
+          credibilityRating: parseInt(parseField('CREDIBILITY_RATING', '', '50')),
+          existenceConfirmed: parseField('EXISTENCE_CONFIRMED', '', 'Unclear'),
+          biasLevel: parseField('BIAS_LEVEL', '', 'Unknown'),
+          factCheckRating: parseField('FACT_CHECK_RATING', '', 'Unknown'),
+          reason: parseField('REASON', '', 'Unable to determine'),
+          evidence: parseField('EVIDENCE', '', 'No evidence found'),
+          redFlags: parseField('RED_FLAGS', '', 'None identified'),
+          crossReferences: parseField('CROSS_REFERENCES', '', 'None found'),
+          recommendation: parseField('RECOMMENDATION', '', 'VERIFY_FURTHER'),
+          reliabilityFactors: parseField('RELIABILITY_FACTORS', '', 'Unknown'),
+          searchQueries: searchQueries,
+          initialCredibilityScore: credibilityScore,
+          fullAnalysis: analysis,
+          validationTimestamp: new Date().toISOString()
+        };
+
+        console.log(`✅ Advanced validation complete for "${source}": ${validation.status} (${validation.confidence}/10 confidence)`);
+        return validation;
+
       } catch (error) {
-        console.error(`❌ Error validating source "${source}":`, error.message);
+        console.error(`❌ Error in advanced validation for "${source}":`, error.message);
         if (attempt === retryAttempts - 1) {
           return {
             source,
             status: "ERROR",
             confidence: 0,
-            reason: `Validation failed: ${error.message}`,
+            credibilityRating: 0,
+            reason: `Advanced validation failed: ${error.message}`,
             evidence: "",
-            recommendation: "VERIFY",
-            searchQuery: "",
-            analysis: "",
+            recommendation: "VERIFY_FURTHER",
+            searchQueries: [],
+            initialCredibilityScore: { score: 0, reasoning: "Validation error" },
+            validationTimestamp: new Date().toISOString()
           };
         }
         // Wait before retry
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 2000));
       }
     }
+  }
+
+  // NEW: Assess initial source credibility based on characteristics
+  assessSourceCredibility(source) {
+    let score = 50; // Start with neutral score
+    const factors = [];
+
+    // Check if it's a URL
+    if (source.match(/^https?:\/\//)) {
+      const domain = source.match(/https?:\/\/(?:www\.)?([^\/]+)/)?.[1];
+      if (domain) {
+        // High credibility domains
+        const highCredibilityDomains = [
+          'nature.com', 'science.org', 'nejm.org', 'thelancet.com', 'cell.com',
+          'pubmed.ncbi.nlm.nih.gov', 'scholar.google.com', 'arxiv.org',
+          'who.int', 'cdc.gov', 'fda.gov', 'nih.gov', 'nasa.gov',
+          'reuters.com', 'ap.org', 'bbc.com', 'npr.org', 'pbs.org',
+          'edu', '.gov', '.org'
+        ];
+
+        // Medium credibility domains
+        const mediumCredibilityDomains = [
+          'nytimes.com', 'washingtonpost.com', 'wsj.com', 'economist.com',
+          'ft.com', 'guardian.com', 'cnn.com', 'cnbc.com', 'bloomberg.com'
+        ];
+
+        // Low credibility indicators
+        const lowCredibilityIndicators = [
+          'wordpress.com', 'blogspot.com', 'medium.com', 'substack.com',
+          'facebook.com', 'twitter.com', 'youtube.com', 'reddit.com'
+        ];
+
+        if (highCredibilityDomains.some(d => domain.includes(d))) {
+          score += 30;
+          factors.push('High-credibility domain');
+        } else if (mediumCredibilityDomains.some(d => domain.includes(d))) {
+          score += 15;
+          factors.push('Established media domain');
+        } else if (lowCredibilityIndicators.some(d => domain.includes(d))) {
+          score -= 20;
+          factors.push('Social media or blog platform');
+        }
+
+        // HTTPS bonus
+        if (source.startsWith('https://')) {
+          score += 5;
+          factors.push('Secure connection');
+        }
+      }
+    }
+
+    // Check for academic/institutional indicators
+    const academicIndicators = [
+      'University', 'Institute', 'College', 'Academy', 'Research',
+      'Journal of', 'Harvard', 'MIT', 'Stanford', 'Oxford', 'Cambridge',
+      'Nature', 'Science', 'Cell', 'NEJM', 'Lancet'
+    ];
+
+    if (academicIndicators.some(indicator => source.includes(indicator))) {
+      score += 25;
+      factors.push('Academic/institutional source');
+    }
+
+    // Check for government indicators
+    const govIndicators = [
+      'Department of', 'Ministry of', 'Bureau of', 'Agency', 'Commission',
+      'CDC', 'FDA', 'WHO', 'NASA', 'NOAA', 'EPA'
+    ];
+
+    if (govIndicators.some(indicator => source.includes(indicator))) {
+      score += 20;
+      factors.push('Government agency');
+    }
+
+    // Check for news organization indicators
+    const newsIndicators = [
+      'Times', 'Post', 'Herald', 'Tribune', 'Journal', 'News',
+      'Reuters', 'Associated Press', 'Bloomberg', 'BBC'
+    ];
+
+    if (newsIndicators.some(indicator => source.includes(indicator))) {
+      score += 10;
+      factors.push('News organization');
+    }
+
+    // Check for warning signs
+    const warningIndicators = [
+      'conspiracy', 'exposed', 'shocking', 'secret', 'hidden truth',
+      'mainstream media', 'big pharma', 'fake news'
+    ];
+
+    if (warningIndicators.some(indicator => source.toLowerCase().includes(indicator.toLowerCase()))) {
+      score -= 30;
+      factors.push('Contains conspiracy language');
+    }
+
+    // Check for very short or vague sources
+    if (source.length < 10) {
+      score -= 20;
+      factors.push('Very short/vague source');
+    }
+
+    // Ensure score stays within bounds
+    score = Math.max(0, Math.min(100, score));
+
+    return {
+      score,
+      reasoning: factors.length > 0 ? factors.join('; ') : 'No specific indicators found',
+      factors
+    };
   }
 
   // NEW: Execute Google search validation for all sources
@@ -1625,8 +2100,8 @@ app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
-    // Successful authentication, redirect to home
-    res.redirect("/");
+    // Successful authentication, redirect to home with auth trigger
+    res.redirect("/?auth=success");
   }
 );
 
@@ -1640,9 +2115,18 @@ app.get("/auth/logout", (req, res) => {
 });
 
 app.get("/auth/user", (req, res) => {
+  console.log('🔍 Auth check request:', {
+    isAuthenticated: req.isAuthenticated(),
+    user: req.user,
+    sessionID: req.sessionID,
+    cookies: req.headers.cookie
+  });
+  
   if (req.isAuthenticated()) {
+    console.log('✅ User is authenticated:', req.user);
     res.json({ user: req.user });
   } else {
+    console.log('❌ User not authenticated');
     res.json({ user: null });
   }
 });

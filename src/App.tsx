@@ -16,6 +16,7 @@ import Guide from "./components/Guide";
 import DataDocs from "./components/DataDocs";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthButton from "./components/AuthButton";
+import AuthDebug from "./components/AuthDebug";
 
 function App() {
   const COLORS = {
@@ -310,6 +311,7 @@ Ready to start the rally?`,
 
   return (
     <ProtectedRoute>
+      <AuthDebug />
       {showDisclaimer && (
         <div
           className="relative bg-amber-100 text-amber-800 text-sm px-3 py-2 text-center"
