@@ -311,7 +311,7 @@ Ready to start the rally?`,
 
   return (
     <ProtectedRoute>
-      <AuthDebug />
+      {/* <AuthDebug /> */}
       {showDisclaimer && (
         <div
           className="relative bg-amber-100 text-amber-800 text-sm px-3 py-2 text-center"
