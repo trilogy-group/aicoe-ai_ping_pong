@@ -17,9 +17,12 @@ app.use(
     secret: process.env.SESSION_SECRET || "your-secret-key-here",
     resave: false,
     saveUninitialized: false,
+    name: 'ai-ping-pong-session',
     cookie: {
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // Set to false for development (HTTP)
+      httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'lax', // Important for OAuth callbacks
     },
   })
 );
@@ -48,6 +51,9 @@ passport.use(
       callbackURL: "/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
+      console.log('🔑 Google OAuth strategy callback triggered');
+      console.log('👤 Google profile:', profile.displayName, profile.emails?.[0]?.value);
+      
       // Here you would typically save the user to your database
       // For now, we'll just return the profile
       const user = {
@@ -57,6 +63,8 @@ passport.use(
         avatar: profile.photos?.[0]?.value,
         provider: "google",
       };
+      
+      console.log('✅ User object created:', user);
       return done(null, user);
     }
   )
@@ -64,11 +72,13 @@ passport.use(
 
 // Serialize user for session
 passport.serializeUser((user, done) => {
+  console.log('💾 Serializing user for session:', user);
   done(null, user);
 });
 
 // Deserialize user from session
 passport.deserializeUser((user, done) => {
+  console.log('🔓 Deserializing user from session:', user);
   done(null, user);
 });
 
@@ -2100,6 +2110,11 @@ app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
+    console.log('🎉 Google OAuth callback successful!');
+    console.log('👤 User data:', req.user);
+    console.log('🔒 Session ID:', req.sessionID);
+    console.log('✅ Is authenticated:', req.isAuthenticated());
+    
     // Successful authentication, redirect to home with auth trigger
     res.redirect("/?auth=success");
   }
@@ -2119,7 +2134,8 @@ app.get("/auth/user", (req, res) => {
     isAuthenticated: req.isAuthenticated(),
     user: req.user,
     sessionID: req.sessionID,
-    cookies: req.headers.cookie
+    cookies: req.headers.cookie,
+    session: req.session
   });
   
   if (req.isAuthenticated()) {
@@ -2129,6 +2145,17 @@ app.get("/auth/user", (req, res) => {
     console.log('❌ User not authenticated');
     res.json({ user: null });
   }
+});
+
+// Debug endpoint to check session
+app.get("/auth/debug", (req, res) => {
+  res.json({
+    sessionID: req.sessionID,
+    isAuthenticated: req.isAuthenticated(),
+    user: req.user,
+    session: req.session,
+    cookies: req.headers.cookie
+  });
 });
 
 // API Routes
@@ -2258,6 +2285,24 @@ app.listen(port, () => {
   console.log(
     `Main generation endpoint: http://localhost:${port}/api/generate`
   );
+  
+  console.log(`\n🔐 Google OAuth Status:`);
+  console.log(
+    `   Google Client ID: ${
+      process.env.GOOGLE_CLIENT_ID ? "✅ Configured" : "❌ Missing"
+    }`
+  );
+  console.log(
+    `   Google Client Secret: ${
+      process.env.GOOGLE_CLIENT_SECRET ? "✅ Configured" : "❌ Missing"
+    }`
+  );
+  console.log(
+    `   Session Secret: ${
+      process.env.SESSION_SECRET ? "✅ Configured" : "❌ Using default"
+    }`
+  );
+  
   console.log(`\n🔑 API Key Status:`);
   console.log(
     `   OpenAI (GPT): ${
